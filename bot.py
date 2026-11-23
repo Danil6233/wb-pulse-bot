@@ -15,7 +15,7 @@ from aiogram.client.default import DefaultBotProperties
 BOT_TOKEN = os.environ.get("BOT_TOKEN")
 
 # ⬇️ ВСТАВЬ СЮДА СВОИ ССЫЛКИ ⬇️
-CHANNEL_URL = "https://t.me/wb_pulse_demo_bot"
+CHANNEL_URL = "https://t.me/pulse_biz_bots"
 CONTACT_URL = "https://t.me/Danil88128"
 
 bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
