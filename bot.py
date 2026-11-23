@@ -14,6 +14,10 @@ from aiogram.client.default import DefaultBotProperties
 
 BOT_TOKEN = os.environ.get("BOT_TOKEN")
 
+# ⬇️ ВСТАВЬ СЮДА СВОИ ССЫЛКИ ⬇️
+CHANNEL_URL = "https://t.me/wb_pulse_demo_bot"
+CONTACT_URL = "https://t.me/Danil88128"
+
 bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 dp = Dispatcher()
 
@@ -97,12 +101,26 @@ def get_main_kb():
         ],
         [
             InlineKeyboardButton(text="🔄 Обновить данные", callback_data="refresh"),
+        ],
+        [
+            InlineKeyboardButton(text="💼 Тарифы и заказ такого бота", callback_data="tariffs"),
+        ],
+        [
+            InlineKeyboardButton(text="📢 Канал с проектами", url=CHANNEL_URL),
+            InlineKeyboardButton(text="💬 Связаться", url=CONTACT_URL),
         ]
     ])
 
 def get_back_kb():
     return InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="⬅️ Назад к сводке", callback_data="summary")]
+    ])
+
+def get_tariffs_kb():
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="💬 Обсудить проект / Заказать", url=CONTACT_URL)],
+        [InlineKeyboardButton(text="📢 Другие проекты в канале", url=CHANNEL_URL)],
+        [InlineKeyboardButton(text="⬅️ Назад к сводке", callback_data="summary")],
     ])
 
 def build_summary_text():
@@ -216,6 +234,23 @@ def build_split_text():
         )
     return "\n".join(lines)
 
+def build_tariffs_text():
+    return (
+        "<b>💼 АКТУАЛЬНЫЕ ТАРИФЫ НА РАЗРАБОТКУ</b>\n"
+        "<i>Соберу аналогичного бота под ваши цифры и задачи.</i>\n\n"
+        "<b>1️⃣ Старт — от 12 000 ₽</b> <i>(3–5 дней)</i>\n"
+        "• Подключение к Google Таблицам или Excel-выгрузкам\n"
+        "• Главная сводка: выручка, прибыль, план месяца\n"
+        "• Базовые кнопки и графики\n\n"
+        "<b>2️⃣ Бизнес под ключ — от 25 000 ₽</b> <i>(7–10 дней)</i>\n"
+        "• Прямая интеграция по API (WB, Ozon, 1С, МойСклад, CRM)\n"
+        "• Автоматические утренние отчёты и алерты по остаткам\n"
+        "• Разбивка по точкам/площадкам, топ и антитоп\n\n"
+        "<b>3️⃣ Поддержка 24/7 — 3 000 ₽/мес</b>\n"
+        "• Хостинг, мониторинг стабильности и мелкие доработки\n\n"
+        "👇 <i>Напишите в личку — бесплатно разберём вашу задачу и сделаем мини-прототип.</i>"
+    )
+
 def build_chart_url():
     dates = sorted(set(r["date"] for r in SALES))[-7:]
     labels = [d.strftime("%d.%m") for d in dates]
@@ -295,6 +330,11 @@ async def cb_split(callback: types.CallbackQuery):
     await callback.message.edit_text(build_split_text(), reply_markup=get_back_kb())
     await callback.answer()
 
+@dp.callback_query(F.data == "tariffs")
+async def cb_tariffs(callback: types.CallbackQuery):
+    await callback.message.edit_text(build_tariffs_text(), reply_markup=get_tariffs_kb())
+    await callback.answer()
+
 @dp.callback_query(F.data == "chart")
 async def cb_chart(callback: types.CallbackQuery):
     await callback.answer("Рисую график...")
@@ -323,5 +363,6 @@ async def main():
     print("🚀 Бот «Пульс бизнеса» запущен на Render!", flush=True)
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
+
 if __name__ == "__main__":
     asyncio.run(main())
